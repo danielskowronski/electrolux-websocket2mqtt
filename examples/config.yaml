@@ -1,0 +1,27 @@
+---
+electrolux:
+  username: email@example.com
+  password: password
+  country: pl
+mqtt:
+  host: localhost
+  port: 1883
+  username: mqtt_user
+  password: mqtt_password
+  topic_prefix: electrolux # topic will be {topic_prefix}/{appliance_name}/{property}
+appliances:
+  air_purifier:
+    device_id: "950000000000000000000001" # "deviceId" from API
+    selected_properties: # empty means all numeric, string and boolean properties
+      - Workmode
+      - Fanspeed
+      - Humidification
+      - HumidityTarget
+      - WaterTrayLevelLow
+      - PM1
+      - PM2_5
+      - PM10
+      - Temp
+      - Humidity
+      - ECO2
+      - TVOC
