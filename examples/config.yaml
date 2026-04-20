@@ -3,6 +3,9 @@ electrolux:
   username: email@example.com
   password: password
   country: pl
+  watchdog:
+    enabled: true
+    timeout_seconds: 360 # expect 120s for humidifier
 mqtt:
   host: localhost
   port: 1883
@@ -12,7 +15,7 @@ mqtt:
 appliances:
   air_purifier:
     device_id: "950000000000000000000001" # "deviceId" from API
-    selected_properties: # empty means all numeric, string and boolean properties
+    selected_properties:
       - Workmode
       - Fanspeed
       - Humidification
@@ -23,5 +26,3 @@ appliances:
       - PM10
       - Temp
       - Humidity
-      - ECO2
-      - TVOC

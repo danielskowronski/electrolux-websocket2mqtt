@@ -6,9 +6,11 @@ import coloredlogs
 import logging
 import asyncio
 import json
+import aiohttp
 from pyelectroluxocp import OneAppApi
 from electrolux_websocket2mqtt.__about__ import __version__
 from electrolux_websocket2mqtt.config.load import load_config
+from electrolux_websocket2mqtt.daemon import load_daemon_config,daemon_run
 
 logger = logging.getLogger(__name__)
 
@@ -54,5 +56,22 @@ def check_api(ctx: click.Context):
             click.echo(f">> Appliance state updated: {json.dumps(a)}")
         await client.watch_for_appliance_state_updates([appliances[0].get("applianceId")], state_update_callback)
   asyncio.run(dump())
-
-# TODO: command: daemon
+@electrolux_websocket2mqtt.command("daemon")
+@click.pass_context
+def daemon(ctx: click.Context):
+  """Run the Electrolux WebSocket to MQTT daemon."""
+  cfg_path = ctx.obj["cfg"]
+  cfg = load_config(cfg_path)
+  logger.debug(f"Loaded configuration from {cfg_path}")
+  load_daemon_config(cfg)
+  while True:
+    try:
+      asyncio.run(daemon_run())
+    except Exception as e:
+      logger.exception("Daemon error, restarting...")
+      if isinstance(e, aiohttp.ClientResponseError) and e.status == 429:
+        logger.warning("Received HTTP 429 Too Many Requests from Electrolux API, likely due to too frequent restarts. Waiting 60 seconds before next restart attempt.")
+        asyncio.run(asyncio.sleep(60))
+      else:
+        logger.info(f"Details: {e}")
+        asyncio.run(asyncio.sleep(5))
