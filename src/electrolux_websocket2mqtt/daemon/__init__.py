@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026-present Daniel Skowroński <electrolux-websocket2mqtt@skowronski.cloud>
 #
 # SPDX-License-Identifier: BSD-3-Clause
+from datetime import datetime
 import logging
 import asyncio
 import json
@@ -10,6 +11,7 @@ from electrolux_websocket2mqtt.__about__ import __version__
 from electrolux_websocket2mqtt.config.schema import Config
 from dataclasses import dataclass
 import aiomqtt
+import electrolux_websocket2mqtt.const as const
 
 @dataclass
 class ReportingAppliance:
@@ -34,7 +36,7 @@ def prepare_device_mapping(cfg: Config) -> None:
       device_id=appliance_cfg.device_id,
       property_topics={}
     )
-    for prop in appliance_cfg.selected_properties:
+    for prop in appliance_cfg.selected_properties + [const.SPECIAL_PROPERTY_LAST_UPDATED]:
       topic = f"{cfg.mqtt.topic_prefix}/{appliance_alias}/{prop}"
       ra.property_topics[prop] = topic
     _dev_map[appliance_cfg.device_id] = ra
@@ -64,6 +66,15 @@ def appliance_update_callback(mqtt_client: aiomqtt.Client, appliance_data: dict,
       continue
     appliance = _dev_map[appliance_id]
     logger.info(f"Received update for appliance with id={appliance_id} and name={appliance.alias}: {json.dumps(appliance_updates)}")
+
+    # deviceId does not change and only appears when WS sends full payload
+    if const.SPECIAL_PROPERTY_CONST in appliance_updates:
+      logger.debug(f"Received update for appliance with id={appliance_id} contains {const.SPECIAL_PROPERTY_CONST} property, will not update {const.SPECIAL_PROPERTY_LAST_UPDATED} because this is initial device status sync, not a live update update")
+    else:
+      last_updated=str(int(datetime.now().timestamp()))
+      task = asyncio.create_task(safe_publish(mqtt_client, appliance.property_topics[const.SPECIAL_PROPERTY_LAST_UPDATED], last_updated, fatal_error))
+      task.add_done_callback(lambda t: t.exception())
+    
     for prop, value in appliance_updates.items():
       if should_report_property(appliance_id, prop):
         topic = appliance.property_topics[prop]

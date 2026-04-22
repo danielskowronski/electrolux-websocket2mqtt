@@ -24,6 +24,8 @@ Each property is published as message with QoS=1 and retain flag (for use with I
 
 Property name is 1:1 from Electrolux API and is device-dependent, so you must first run `check_api` to see what your device is exposing. For now, both keys and values are taken straight from JSON data sent by API.
 
+Additionaly, special property `__last_updated__` is published with current timestamp each time any non-initial update from device is received (not restricted to `selected_properties`, but ignored on first full message). This is useful for systems that want to ensure data from device is not stale. Right now, this is taken from local clock - it would be better to utilize metadata sent over WebSocket, but current library does not expose it.
+
 ### Config
 
 It's read from disk, by default from `~/.config/electrolux-websocket2mqtt/config.yaml`. See example in [examples/config.yaml](./examples/config.yaml).
