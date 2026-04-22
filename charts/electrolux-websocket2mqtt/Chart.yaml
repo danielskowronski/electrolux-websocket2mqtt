@@ -1,0 +1,15 @@
+---
+apiVersion: v2
+name: electrolux-websocket2mqtt
+description: Helm chart for deploying the Electrolux Websocket To MQTT (electrolux-websocket2mqtt) application on Kubernetes.
+type: application
+version: 0.1.0
+appVersion: "v0.0.2"
+keywords:
+  - emqx
+  - mqtt
+  - prometheus
+  - exporter
+maintainers:
+  - name: Daniel Skowroński
+    email: electrolux-websocket2mqtt@skowronski.cloud

@@ -81,7 +81,7 @@ async def watchdog_task() -> None:
   while True:
     await asyncio.sleep(_cfg.electrolux.watchdog.timeout_seconds/100)
     elapsed = time.monotonic() - _last_ws_message_time
-    logger.info(f"Watchdog check: elapsed={elapsed:.1f} seconds")
+    logger.debug(f"Watchdog check: elapsed={elapsed:.1f} seconds")
     if elapsed > _cfg.electrolux.watchdog.timeout_seconds:
       logger.warning(f"No WebSocket messages received for {elapsed:.1f} seconds, triggering daemon restart")
       raise Exception("WebSocket connection appears to be stalled")

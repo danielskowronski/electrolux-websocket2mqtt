@@ -1,0 +1,68 @@
+---
+image:
+  repository: ghcr.io/danielskowronski/electrolux-websocket2mqtt
+  tag: ""
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+config:
+  existingSecret: ""
+  configDir: "/etc/electrolux-websocket2mqtt/config/"
+  configFilename: "config.yaml"
+  configBody: |-
+    electrolux:
+      username: email@example.com
+      password: password
+      country: pl
+      watchdog:
+        enabled: true
+        timeout_seconds: 360 # expect 120s for humidifier
+    mqtt:
+      host: localhost
+      port: 1883
+      username: mqtt_user
+      password: mqtt_password
+      topic_prefix: electrolux # topic will be {topic_prefix}/{appliance_name}/{property}
+    appliances:
+      air_purifier:
+        device_id: "950000000000000000000001" # "deviceId" from API
+        selected_properties:
+          - Workmode
+          - Fanspeed
+          - Humidification
+          - HumidityTarget
+          - WaterTrayLevelLow
+          - PM1
+          - PM2_5
+          - PM10
+          - Temp
+          - Humidity
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+
+# TODO: implement network policy based on SNI - Electrolux APIs are on Azure

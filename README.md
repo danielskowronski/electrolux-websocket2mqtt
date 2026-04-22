@@ -73,8 +73,10 @@ My own [HumidifierWaterRefillTerminal](https://github.com/danielskowronski/Humid
 
 ## Status
 
-- [.] MVP: Electrolux API client getting initial and updated properties filtered by config and republishing to MQTT - just script
-- [ ] proper k8s integrations incl. Helm chart
+- [x] MVP: Electrolux API client getting initial and updated properties filtered by config and republishing to MQTT - just script
+- [.] proper k8s integrations incl. Helm chart
+- [ ] support monitoring for last updated datetime
+- [ ] prometheus exporter or VM pusher (as seen in https://github.com/danielskowronski/qingping-iot-mqtt/)
 - [ ] proper error handling in WebSocket (better than watchdog)
 - [ ] debug mode
 - [ ] HA auto discovery payloads
